@@ -1,0 +1,11 @@
+dist: xenial
+language: python
+python:
+  - "3.6"
+  - "3.7"
+before_script:
+  - "sudo apt-get update"
+  - "sudo apt-get install -y libopus-dev"
+  - "pip install -U Cython==0.27.3"
+script:
+  - "python ./setup.py bdist_egg bdist_wheel"

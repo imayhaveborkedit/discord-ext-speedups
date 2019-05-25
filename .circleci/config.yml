@@ -1,0 +1,41 @@
+
+version: 2
+
+jobs:
+  "make manylinux":
+    docker:
+      - image: quay.io/pypa/manylinux2010_x86_64
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            yum install -y opus-devel
+            /opt/python/cp36-cp36m/bin/pip install -U Cython==0.27.3
+            /opt/python/cp37-cp37m/bin/pip install -U Cython==0.27.3
+
+      - run:
+          name: build distributions
+          command: |
+            /opt/python/cp36-cp36m/bin/python ./setup.py bdist_egg bdist_wheel
+            /opt/python/cp37-cp37m/bin/python ./setup.py bdist_egg bdist_wheel
+
+      - run:
+          name: create manylinux wheel
+          command: |
+            for whl in dist/*.whl; do auditwheel repair "$whl" --plat manylinux2010_x86_64 -w dist; done
+            rm dist/*-linux_x86_64.whl
+
+      - store_artifacts:
+          path: dist
+          destination: distributions
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "make manylinux"
