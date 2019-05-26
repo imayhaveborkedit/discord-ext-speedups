@@ -97,7 +97,7 @@ setup(
     setup_requires=['Cython==0.27.3'],
     zip_safe=False,
 
-    packages=['discord.ext.speedups'],
+    packages=['discord.ext.speedups', 'discord.ext.speedups.copus'],
     package_dir={'discord.ext.speedups': 'speedups'},
 
     ext_modules = cythonize(c_extensions,
