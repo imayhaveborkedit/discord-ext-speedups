@@ -22,6 +22,7 @@ libraries = {
 }
 
 if platform == 'win32':
+    runtime_lib_dirs = []
     include_dirs.append(cwd / 'include')
 
 def get_extension_data():

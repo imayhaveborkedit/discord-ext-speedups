@@ -58,7 +58,6 @@ class defaults:
 
     # Platform tweaks
     if platform == 'win32':
-        # runtime_lib_dirs = []
         if arch == 64:
             extra_compile_args.append('-DMS_WIN64')
 
