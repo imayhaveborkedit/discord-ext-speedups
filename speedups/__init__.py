@@ -1,3 +1,9 @@
+__title__ = 'discord.ext.speedups'
+__author__ = 'Imayhaveborkedit'
+__license__ = 'MIT'
+__copyright__ = 'Copyright 2019 Imayhaveborkedit'
+__version__ = '0.0.1'
+
 from . import copus
 
 _modules = {

@@ -1,4 +1,5 @@
 import os
+import re
 import pathlib
 import struct
 import sys
@@ -11,6 +12,12 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 logging.disable(logging.WARNING)
+
+
+version = ''
+with open('speedups/__init__.py') as f:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
+    print(f"Building version {version}")
 
 # System info
 platform = sys.platform
@@ -85,7 +92,7 @@ with open(readme_path, 'r', encoding='utf-8') as fp:
 
 setup(
     name='discord-ext-speedups',
-    author='imayhaveborkedit',
+    author='Imayhaveborkedit',
     url='https://github.com/imayhaveborkedit/discord-ext-speedups',
 
     license='MIT',
@@ -97,7 +104,7 @@ setup(
         'Issue tracker': 'https://github.com/imayhaveborkedit/discord-ext-speedups/issues'
     },
 
-    version='0.0.1',
+    version=version,
     python_requires='>=3.6.4',
     setup_requires=['Cython==0.27.3'],
     zip_safe=False,
@@ -107,7 +114,6 @@ setup(
 
     ext_modules = cythonize(c_extensions,
         nthreads=3,
-        annotate=True,
         compiler_directives=compiler_directives
     )
 )
