@@ -6,16 +6,15 @@ import logging
 __all__ = ['install', 'uninstall', 'libopus_loader', 'load_opus', 'is_loaded']
 
 log = logging.getLogger(__name__)
-
-# Fix PATH on windows
-if sys.platform == 'win32':
-    _arch = struct.calcsize('P') * 8
-    _basepath = os.path.dirname(__file__)
-    _binpath = os.path.abspath(os.path.normpath(os.path.join(_basepath, 'bin', f'x{_arch}')))
-    log.info("Adding %r to os.environ['PATH']", _binpath)
-    os.environ["PATH"] += os.pathsep + _binpath
-
 _clib = None
+
+def patch_path():
+    if sys.platform == 'win32':
+        _arch = struct.calcsize('P') * 8
+        _basepath = os.path.dirname(__file__)
+        _binpath = os.path.abspath(os.path.normpath(os.path.join(_basepath, 'bin', f'x{_arch}')))
+        log.info("Adding %r to os.environ['PATH']", _binpath)
+        os.environ["PATH"] += os.pathsep + _binpath
 
 # Copy functions from opus.py for compat
 
@@ -32,10 +31,15 @@ def libopus_loader(name=None):
         import _copus
         return _copus
     except:
-        raise err # from None?
+        raise err from None
 
 def load_opus(name=None):
     """Compat function."""
+
+    if is_loaded():
+        return
+
+    patch_path()
 
     try:
         global _clib
@@ -44,21 +48,23 @@ def load_opus(name=None):
         raise
     else:
         self = sys.modules[__name__]
-        __install_to_module(self)
+        _install_to_module(self)
     finally:
-        ... # TODO: pop added path in finally?
+        pass # TODO: pop added path in finally?
 
 def is_loaded():
     """Compat function."""
-
     return _clib is not None
 
 # New functions
 
 def install(module=None):
-    """Monkeypatches the given module (defaults to discord) to use the extension objects.
+    """
+    Monkeypatches the given module (defaults to discord) to use the extension objects.
     Basically it's just a setattr loop for this module's __all__.
     """
+
+    load_opus()
 
     if module is None:
         discord = sys.modules.get('discord')
@@ -67,9 +73,9 @@ def install(module=None):
         else:
             raise TypeError("Could not find discord and no module parameter provided")
 
-    __install_to_module(module)
+    _install_to_module(module)
 
-def __install_to_module(module):
+def _install_to_module(module):
     _nothing = object()
     module._copus = _clib
     module._copus_monkeypatched = True
@@ -94,9 +100,9 @@ def uninstall(module=None):
     if not getattr(module, '_copus_monkeypatched', False):
         raise RuntimeError("Module {} has not been installed to.".format(module))
 
-    __uninstall_from_module(module)
+    _uninstall_from_module(module)
 
-def __uninstall_from_module(module):
+def _uninstall_from_module(module):
     _nothing = object()
     del module._copus
     del module._copus_monkeypatched
@@ -107,8 +113,3 @@ def __uninstall_from_module(module):
         if orig is not _nothing:
             setattr(module, attr, orig)
             delattr(module, '__copus__old__'+attr)
-
-try:
-    load_opus()
-except Exception as e:
-    log.warning("Unable to load opus lib, %s", e)
