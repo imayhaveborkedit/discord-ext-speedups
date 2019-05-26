@@ -20,6 +20,8 @@ def install(*install_modules, ignore=False):
 
     if ignore:
         install_modules = tuple(set(install_modules).symmetric_difference(_modules))
+    elif not install_modules:
+        install_modules = tuple(_modules)
 
     for mod in install_modules:
         patch = _modules.get(mod)
@@ -41,6 +43,8 @@ def uninstall(*uninstall_modules, ignore=False):
 
     if ignore:
         uninstall_modules = tuple(set(uninstall_modules).symmetric_difference(_installed))
+    elif not uninstall_modules:
+        uninstall_modules = tuple(_installed)
 
     for mod in uninstall_modules:
         patch = _modules.get(mod)
