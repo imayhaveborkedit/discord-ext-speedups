@@ -27,7 +27,7 @@ if platform == 'win32':
 
 def get_extension_data():
     return {
-        'name': 'discord.ext.copus._copus',
+        'name': 'discord.ext.speedups.copus._copus',
         'sources': [extension_path / '_copus.pyx'],
         'libraries': libraries[platform],
         'include_dirs': include_dirs,
