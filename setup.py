@@ -41,7 +41,7 @@ def _build_list(k, v):
     return v
 
 _, _dirs, _ = next(os.walk(cwd / 'speedups'))
-packages = [d for d in _dirs if not d.startswith('__')]
+package_names = [d for d in _dirs if not d.startswith('__')]
 
 class defaults:
     def __new__(cls, *args, **kwargs):
@@ -66,13 +66,18 @@ compiler_directives = {
     'embedsignature': True
 }
 
+packages = ['discord.ext.speedups']
+
 # Generate extensions
+print("Generating extensions for", ', '.join(package_names))
 c_extensions = []
-print("Generating extensions for", ''.join(packages))
-for extension_dir in packages:
+
+for extension_dir in package_names:
     module = importlib.import_module(f'speedups.{extension_dir}._setup')
     ext_data = normalize_ext_data(module.get_extension_data())
+
     c_extensions.append(Extension(**ext_data))
+    packages.append(f'discord.ext.speedups.{extension_dir}')
 
 # Package setup
 with open(readme_path, 'r', encoding='utf-8') as fp:
@@ -97,7 +102,7 @@ setup(
     setup_requires=['Cython==0.27.3'],
     zip_safe=False,
 
-    packages=['discord.ext.speedups', 'discord.ext.speedups.copus'],
+    packages=packages,
     package_dir={'discord.ext.speedups': 'speedups'},
 
     ext_modules = cythonize(c_extensions,
