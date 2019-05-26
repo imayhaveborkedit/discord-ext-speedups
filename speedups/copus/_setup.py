@@ -1,9 +1,6 @@
-import os
 import pathlib
 import struct
 import sys
-
-from distutils.extension import Extension
 
 # System info
 platform = sys.platform
@@ -24,6 +21,9 @@ libraries = {
     'linux': ['opus']
 }
 
+if platform == 'win32':
+    include_dirs.append(cwd / 'include')
+
 def get_extension_data():
     return {
         'name': 'discord.ext.copus._copus',
@@ -31,7 +31,5 @@ def get_extension_data():
         'libraries': libraries[platform],
         'include_dirs': include_dirs,
         'library_dirs': library_dirs,
-        'extra_compile_args': extra_compile_args,
-        'extra_link_args': extra_link_args,
-        'runtime_lib_dirs': runtime_lib_dirs
+        'runtime_library_dirs': runtime_lib_dirs
     }

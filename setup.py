@@ -24,7 +24,6 @@ def normalize(path_list, relative_to=None):
     """
     Converts a list of pathlib.Paths into a list of strings relative to a directory.
     """
-
     relative_to = relative_to or cwd
     return [(relative_to / x).as_posix() for x in path_list]
 
@@ -33,16 +32,16 @@ def normalize_ext_data(data):
     Combine and normalize Extension data.  Passing a tuple for an item will ignore defaults.
     """
     normlist = ('sources', 'include_dirs', 'library_dirs', 'runtime_library_dirs')
-    return data.update({k: normalize(_build_list(k, v)) for k, v in data if v in normlist})
+    data.update({k: normalize(_build_list(k, v)) for k, v in data.items() if k in normlist})
+    return data
 
 def _build_list(k, v):
-    if isinstance(data, list):
+    if isinstance(k, list):
         return defaults(k) + v
     return v
 
-
-_, _dirs, _ = os.walk(cwd / 'speedups')
-packages = _dirs
+_, _dirs, _ = next(os.walk(cwd / 'speedups'))
+packages = [d for d in _dirs if not d.startswith('__')]
 
 class defaults:
     def __new__(cls, *args, **kwargs):
@@ -59,9 +58,7 @@ class defaults:
 
     # Platform tweaks
     if platform == 'win32':
-        include_dirs.append(cwd / 'include')
         # runtime_lib_dirs = []
-
         if arch == 64:
             extra_compile_args.append('-DMS_WIN64')
 
@@ -72,11 +69,11 @@ compiler_directives = {
 
 # Generate extensions
 c_extensions = []
-for extension_dir in _dirs:
+print("Generating extensions for", ''.join(packages))
+for extension_dir in packages:
     module = importlib.import_module(f'speedups.{extension_dir}._setup')
     ext_data = normalize_ext_data(module.get_extension_data())
     c_extensions.append(Extension(**ext_data))
-
 
 # Package setup
 with open(readme_path, 'r', encoding='utf-8') as fp:
