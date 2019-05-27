@@ -8,6 +8,8 @@ import logging
 
 from . import copus
 
+__all__ = []
+
 log = logging.getLogger(__name__)
 
 _modules = {
@@ -92,6 +94,12 @@ def uninstall(*uninstall_modules, ignore=False):
                 uninstalled_now.append(mod)
 
     return uninstalled_now
+
+def get_available_patches():
+    """
+    Returns a tuple of available module names.
+    """
+    return tuple(_modules)
 
 def get_installed_patches():
     """
