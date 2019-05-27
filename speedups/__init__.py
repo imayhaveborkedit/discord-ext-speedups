@@ -12,16 +12,24 @@ _modules = {
 
 _installed = []
 
+def _module_basename(module):
+    return module.__name__.rsplit('.', 1)[-1]
+
 def install(*install_modules, ignore=False):
     """
     Patches in replacement modules.
 
     Parameters
     -----------
-    \*install_modules
+    \*install_modules: :class:`str`
         An argument list of strings of modules to install.
     ignore: :class:`bool`
         If True, install all available modules *except* the given modules.
+
+    Returns
+    --------
+    :class:`list`[:class:`str`]
+        A list of module names that were installed from this function call.
     """
 
     if ignore:
@@ -29,11 +37,16 @@ def install(*install_modules, ignore=False):
     elif not install_modules:
         install_modules = tuple(_modules)
 
+    installed_now = []
+
     for mod in install_modules:
         patch = _modules.get(mod)
         if patch and patch not in _installed:
             patch.install()
             _installed.append(patch)
+            installed_now.append(mod)
+
+    return installed_now
 
 def uninstall(*uninstall_modules, ignore=False):
     """
@@ -41,25 +54,35 @@ def uninstall(*uninstall_modules, ignore=False):
 
     Parameters
     -----------
-    \*uninstall_modules
+    \*uninstall_modules: :class:`str`
         An argument list of strings of modules to uninstall.
     ignore: :class:`bool`
         If True, uninstall all available modules *except* the given modules.
+
+    Returns
+    --------
+    :class:`list`[:class:`str`]
+        A list of module names that were uninstalled from this function call.
     """
 
     if ignore:
         uninstall_modules = tuple(set(uninstall_modules).symmetric_difference(_installed))
     elif not uninstall_modules:
-        uninstall_modules = tuple(_installed)
+        uninstall_modules = tuple(_module_basename(m) for m in _installed)
+
+    uninstalled_now = []
 
     for mod in uninstall_modules:
         patch = _modules.get(mod)
         if patch and patch in _installed:
             patch.uninstall()
             _installed.remove(patch)
+            uninstalled_now.append(mod)
+
+    return uninstalled_now
 
 def get_installed_patches():
     """
-    Returns a tuple of installed modules.
+    Returns a tuple of installed module names.
     """
     return tuple(_installed)
