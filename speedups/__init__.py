@@ -4,7 +4,11 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2019 Imayhaveborkedit'
 __version__ = '0.0.1'
 
+import logging
+
 from . import copus
+
+log = logging.getLogger(__name__)
 
 _modules = {
     'copus': copus
@@ -42,9 +46,13 @@ def install(*install_modules, ignore=False):
     for mod in install_modules:
         patch = _modules.get(mod)
         if patch and patch not in _installed:
-            patch.install()
-            _installed.append(patch)
-            installed_now.append(mod)
+            try:
+                patch.install()
+            except:
+                log.exception("Failed to patch in %s", patch)
+            else:
+                _installed.append(patch)
+                installed_now.append(mod)
 
     return installed_now
 
@@ -75,9 +83,13 @@ def uninstall(*uninstall_modules, ignore=False):
     for mod in uninstall_modules:
         patch = _modules.get(mod)
         if patch and patch in _installed:
-            patch.uninstall()
-            _installed.remove(patch)
-            uninstalled_now.append(mod)
+            try:
+                patch.uninstall()
+            except:
+                log.exception("Failed to undo patch for %s", patch)
+            else:
+                _installed.remove(patch)
+                uninstalled_now.append(mod)
 
     return uninstalled_now
 
