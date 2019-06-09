@@ -6,6 +6,6 @@ python:
 before_script:
   - "sudo apt-get update"
   - "sudo apt-get install -y libopus-dev"
-  - "pip install -U Cython==0.27.3"
+  - "pip install -U Cython==0.28.6"
 script:
   - "python ./setup.py bdist_egg bdist_wheel"

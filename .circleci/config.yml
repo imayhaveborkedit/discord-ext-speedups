@@ -15,8 +15,8 @@ jobs:
           name: install dependencies
           command: |
             yum install -y opus-devel
-            /opt/python/cp36-cp36m/bin/pip install -U Cython==0.27.3
-            /opt/python/cp37-cp37m/bin/pip install -U Cython==0.27.3
+            /opt/python/cp36-cp36m/bin/pip install -U Cython==0.28.6
+            /opt/python/cp37-cp37m/bin/pip install -U Cython==0.28.6
 
       - run:
           name: build distributions

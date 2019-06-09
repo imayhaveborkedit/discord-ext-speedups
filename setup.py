@@ -106,7 +106,7 @@ setup(
 
     version=version,
     python_requires='>=3.6.4',
-    setup_requires=['Cython==0.27.3'],
+    setup_requires=['Cython==0.28.6'],
     zip_safe=False,
 
     packages=packages,
