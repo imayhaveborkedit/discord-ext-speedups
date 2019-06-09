@@ -72,6 +72,11 @@ cdef class _OpusAudio:
         self.FRAME_SIZE = self.SAMPLES_PER_FRAME * self.SAMPLE_SIZE
 
 cdef class Encoder(_OpusAudio):
+    cdef dict __dict__
+    cdef readonly int application
+    cdef opus.OpusEncoder *state
+    cdef array.array _output_template
+
     def __cinit__(self, int application=opus.APPLICATION_AUDIO):
         self.application = application
         self._create_state()
@@ -140,6 +145,7 @@ cdef class Encoder(_OpusAudio):
 
     cpdef bytes encode(self, pcm, int frame_size):
         cdef int max_size = len(pcm)
+        # TODO: Make part of the class and just resize instead of remake every call
         cdef array.array _pcm = array.array('h', pcm)
         cdef array.array data = array.clone(self._output_template, max_size//4, zero=False)
 
@@ -150,7 +156,8 @@ cdef class Encoder(_OpusAudio):
         return data.tobytes()
 
     cdef int _encode(self, short *pcm, int frame_size, unsigned char *data, int max_size) nogil:
-        return opus.encode(self.state, pcm, frame_size, data, max_size)
+        with nogil:
+            return opus.encode(self.state, pcm, frame_size, data, max_size)
 
 
 cdef class Decoder:
