@@ -12,7 +12,7 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 logging.disable(logging.WARNING)
-
+sys.cython_building = True
 
 version = ''
 with open('speedups/__init__.py') as f:
