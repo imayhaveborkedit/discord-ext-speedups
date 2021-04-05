@@ -1,8 +1,12 @@
 # discord-ext-speedups
+
+An obsolete cython/CI test.
+
 Cython speedups for various parts of discord.py
 
 ## Installation
-`pip install discord-ext-speedups`
+You dont.
+<!-- `pip install discord-ext-speedups` -->
 
 ## Usage
 ```py
